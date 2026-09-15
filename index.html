@@ -250,12 +250,26 @@
     .detail{padding:22px 20px;}
   }
 
+  .detail-actions{display:flex;gap:10px;margin-top:18px;}
   .order-btn{
-    width:100%;margin-top:18px;padding:12px;border-radius:10px;border:none;
-    background:var(--accent);color:#fff;font-weight:700;font-size:14px;cursor:pointer;
+    flex:1;padding:12px;border-radius:10px;border:none;
+    background:var(--accent-soft);color:var(--accent-ink);font-weight:700;font-size:13.5px;cursor:pointer;
     font-family:var(--font-body);transition:background .15s;
   }
-  .order-btn:hover{background:var(--accent-2);}
+  .order-btn:hover{background:var(--bg-alt);}
+  .pay-btn{
+    flex:1;padding:12px;border-radius:10px;border:none;
+    background:var(--accent);color:#fff;font-weight:700;font-size:13.5px;cursor:pointer;
+    font-family:var(--font-body);transition:background .15s;
+  }
+  .pay-btn:hover{background:var(--accent-2);}
+
+  .pay-banner{
+    max-width:560px;margin:0 auto 18px;padding:14px 18px;border-radius:14px;
+    font-weight:700;font-size:14px;text-align:center;
+  }
+  .pay-banner.ok{background:#DFF5E9;color:#1a7a4a;}
+  .pay-banner.cancel{background:var(--bg-alt);color:var(--ink-soft);}
 
   /* ---------- ORDER MODAL ---------- */
   .modal-overlay{
@@ -376,6 +390,7 @@
   </div>
 
   <div class="carousel-section wrap">
+    <div id="payBanner"></div>
     <div class="stage" id="stage">
       <div class="scene-sun"></div>
       <svg class="scene-waves" viewBox="0 0 1000 220" preserveAspectRatio="none" aria-hidden="true">
@@ -500,6 +515,28 @@
         <button type="submit" class="modal-submit" id="authSubmitBtn">로그인</button>
       </div>
       <div class="modal-msg" id="authMsg"></div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-overlay" id="payModal" hidden>
+  <div class="modal-box">
+    <h3>카드로 결제하기</h3>
+    <p class="modal-sub" id="payModalBoard"></p>
+    <form id="payForm">
+      <div class="modal-field">
+        <label for="payName">이름</label>
+        <input type="text" id="payName" required autocomplete="name">
+      </div>
+      <div class="modal-field">
+        <label for="payContact">연락처 (전화번호 또는 이메일)</label>
+        <input type="text" id="payContact" required autocomplete="tel">
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="modal-cancel" onclick="closePayModal()">취소</button>
+        <button type="submit" class="modal-submit" id="paySubmitBtn">결제하러 가기</button>
+      </div>
+      <div class="modal-msg" id="payMsg"></div>
     </form>
   </div>
 </div>
@@ -643,7 +680,10 @@
         '<div><span class="spec-label">두께</span><span class="spec-val">' + b.thick + '</span></div>' +
         '<div><span class="spec-label">부력</span><span class="spec-val">' + b.volume + '</span></div>' +
       '</div>' +
-      '<button type="button" class="order-btn" onclick="openOrderModal()">📩 이 보드 구매 문의하기</button>';
+      '<div class="detail-actions">' +
+        '<button type="button" class="order-btn" onclick="openOrderModal()">📩 문의하기</button>' +
+        '<button type="button" class="pay-btn" onclick="openPayModal()">💳 카드로 결제하기</button>' +
+      '</div>';
   }
 
   function angleToIndex(i){
@@ -902,6 +942,76 @@
   } else {
     renderAuthArea();
   }
+
+  // ── 카드 결제 (Stripe Checkout) ──
+  function openPayModal(){
+    var b = BOARDS[activeIndex];
+    document.getElementById('payModalBoard').textContent = b.name + ' · ' + fmtWon(b.price);
+    var form = document.getElementById('payForm');
+    form.dataset.boardId = b.id;
+    form.reset();
+    if (currentUser) document.getElementById('payContact').value = currentUser.email;
+    var msgEl = document.getElementById('payMsg');
+    msgEl.textContent = ''; msgEl.className = 'modal-msg';
+    var btn = document.getElementById('paySubmitBtn');
+    btn.disabled = false; btn.textContent = '결제하러 가기';
+    document.getElementById('payModal').hidden = false;
+  }
+  function closePayModal(){
+    document.getElementById('payModal').hidden = true;
+  }
+  window.openPayModal = openPayModal;
+  window.closePayModal = closePayModal;
+
+  document.getElementById('payModal').addEventListener('click', function(e){
+    if (e.target === e.currentTarget) closePayModal();
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && !document.getElementById('payModal').hidden) closePayModal();
+  });
+
+  document.getElementById('payForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    var msgEl = document.getElementById('payMsg');
+    var btn = document.getElementById('paySubmitBtn');
+    if (!sb) {
+      msgEl.textContent = '결제 기능을 잠시 사용할 수 없어요. 잠시 후 다시 시도해주세요.';
+      msgEl.className = 'modal-msg err';
+      return;
+    }
+    var payload = {
+      board_id: e.target.dataset.boardId,
+      customer_name: document.getElementById('payName').value.trim(),
+      contact: document.getElementById('payContact').value.trim(),
+    };
+    btn.disabled = true; btn.textContent = '연결 중...';
+    sb.functions.invoke('create-checkout-session', { body: payload }).then(function(res){
+      if (res.error || !res.data || !res.data.url) {
+        var reason = (res.data && res.data.error) || (res.error && res.error.message) || '알 수 없는 오류';
+        msgEl.textContent = '결제 연결에 실패했어요: ' + reason;
+        msgEl.className = 'modal-msg err';
+        btn.disabled = false; btn.textContent = '결제하러 가기';
+        return;
+      }
+      window.location.href = res.data.url;
+    });
+  });
+
+  // ── 결제 완료/취소 후 리디렉션 안내 배너 ──
+  (function showPayBanner(){
+    var params = new URLSearchParams(window.location.search);
+    var paid = params.get('paid');
+    if (!paid) return;
+    var banner = document.getElementById('payBanner');
+    if (paid === 'success') {
+      banner.innerHTML = '<div class="pay-banner ok">결제가 완료됐어요! 빠르게 배송 및 제작을 준비할게요.</div>';
+    } else if (paid === 'cancelled') {
+      banner.innerHTML = '<div class="pay-banner cancel">결제가 취소됐어요. 다시 시도하시려면 보드를 선택해 결제 버튼을 눌러주세요.</div>';
+    }
+    params.delete('paid');
+    var qs = params.toString();
+    history.replaceState({}, '', window.location.pathname + (qs ? '?' + qs : ''));
+  })();
 
   buildRing();
   buildGrid();
