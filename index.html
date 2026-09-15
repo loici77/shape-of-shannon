@@ -61,10 +61,24 @@
     display:flex;align-items:center;gap:8px;
   }
   .brand .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);display:inline-block;}
+  .nav-right{display:flex;align-items:center;gap:22px;}
   .nav-links{display:flex;gap:28px;font-size:14px;font-weight:600;color:var(--ink-soft);}
   .nav-links a{text-decoration:none;transition:color .15s;}
   .nav-links a:hover{color:var(--accent-2);}
   @media (max-width:640px){ .nav-links{display:none;} }
+  .auth-btn{
+    padding:9px 16px;border-radius:999px;border:1px solid var(--line);
+    background:var(--surface);color:var(--ink);font-weight:700;font-size:13px;
+    cursor:pointer;font-family:var(--font-body);transition:border-color .15s,color .15s;
+    white-space:nowrap;
+  }
+  .auth-btn:hover{border-color:var(--accent);color:var(--accent-2);}
+  .auth-user{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--ink-soft);}
+  .auth-user .who{font-weight:700;color:var(--ink);}
+  .auth-user button{
+    border:none;background:none;color:var(--ink-faint);font-size:12.5px;
+    cursor:pointer;text-decoration:underline;font-family:var(--font-body);
+  }
 
   /* ---------- HERO ---------- */
   .hero{
@@ -276,6 +290,15 @@
   .modal-msg.ok{color:#1a7a4a;}
   .modal-msg.err{color:var(--accent-2);}
 
+  /* ---------- AUTH MODAL ---------- */
+  .auth-tabs{display:flex;gap:6px;margin-bottom:16px;background:var(--bg-alt);padding:4px;border-radius:10px;}
+  .auth-tab{
+    flex:1;padding:8px;border-radius:7px;border:none;background:none;
+    font-weight:700;font-size:13px;color:var(--ink-faint);cursor:pointer;
+    font-family:var(--font-body);transition:background .15s,color .15s;
+  }
+  .auth-tab.active{background:var(--surface);color:var(--ink);box-shadow:0 2px 6px rgba(10,25,35,.08);}
+
   /* ---------- WAVE DIVIDER ---------- */
   .wave{display:block;width:100%;height:auto;margin-top:60px;}
   .wave path{fill:var(--bg-alt);}
@@ -335,10 +358,13 @@
 
 <nav class="nav">
   <div class="brand"><span class="dot"></span>Shape of Shannon's</div>
-  <div class="nav-links">
-    <a href="#carousel">보드 고르기</a>
-    <a href="#story">브랜드 스토리</a>
-    <a href="#lineup">전체 라인업</a>
+  <div class="nav-right">
+    <div class="nav-links">
+      <a href="#carousel">보드 고르기</a>
+      <a href="#story">브랜드 스토리</a>
+      <a href="#lineup">전체 라인업</a>
+    </div>
+    <div id="authArea"></div>
   </div>
 </nav>
 
@@ -450,6 +476,30 @@
         <button type="submit" class="modal-submit" id="orderSubmitBtn">문의 보내기</button>
       </div>
       <div class="modal-msg" id="orderMsg"></div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-overlay" id="authModal" hidden>
+  <div class="modal-box">
+    <div class="auth-tabs">
+      <button type="button" class="auth-tab active" id="authTabLogin" onclick="setAuthMode('login')">로그인</button>
+      <button type="button" class="auth-tab" id="authTabSignup" onclick="setAuthMode('signup')">회원가입</button>
+    </div>
+    <form id="authForm">
+      <div class="modal-field">
+        <label for="authEmail">이메일</label>
+        <input type="email" id="authEmail" required autocomplete="email">
+      </div>
+      <div class="modal-field">
+        <label for="authPw">비밀번호</label>
+        <input type="password" id="authPw" required minlength="6" autocomplete="current-password">
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="modal-cancel" onclick="closeAuthModal()">취소</button>
+        <button type="submit" class="modal-submit" id="authSubmitBtn">로그인</button>
+      </div>
+      <div class="modal-msg" id="authMsg"></div>
     </form>
   </div>
 </div>
@@ -749,6 +799,109 @@
       setTimeout(closeOrderModal, 1600);
     });
   });
+
+  // ── 회원가입 / 로그인 ──
+  var authMode = 'login';
+  var currentUser = null;
+
+  function setAuthMode(mode){
+    authMode = mode;
+    document.getElementById('authTabLogin').classList.toggle('active', mode === 'login');
+    document.getElementById('authTabSignup').classList.toggle('active', mode === 'signup');
+    document.getElementById('authSubmitBtn').textContent = mode === 'login' ? '로그인' : '회원가입';
+    document.getElementById('authPw').autocomplete = mode === 'login' ? 'current-password' : 'new-password';
+    var msgEl = document.getElementById('authMsg');
+    msgEl.textContent = ''; msgEl.className = 'modal-msg';
+  }
+  window.setAuthMode = setAuthMode;
+
+  function openAuthModal(mode){
+    setAuthMode(mode || 'login');
+    document.getElementById('authForm').reset();
+    document.getElementById('authModal').hidden = false;
+  }
+  function closeAuthModal(){
+    document.getElementById('authModal').hidden = true;
+  }
+  window.openAuthModal = openAuthModal;
+  window.closeAuthModal = closeAuthModal;
+
+  document.getElementById('authModal').addEventListener('click', function(e){
+    if (e.target === e.currentTarget) closeAuthModal();
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && !document.getElementById('authModal').hidden) closeAuthModal();
+  });
+
+  function renderAuthArea(){
+    var area = document.getElementById('authArea');
+    if (currentUser) {
+      area.innerHTML = '<div class="auth-user"><span class="who">' + currentUser.email + '</span><button type="button" id="logoutBtn">로그아웃</button></div>';
+      document.getElementById('logoutBtn').addEventListener('click', function(){
+        sb.auth.signOut();
+      });
+    } else {
+      area.innerHTML = '<button type="button" class="auth-btn" onclick="openAuthModal(\'login\')">로그인 / 회원가입</button>';
+    }
+  }
+
+  if (sb) {
+    document.getElementById('authForm').addEventListener('submit', function(e){
+      e.preventDefault();
+      var msgEl = document.getElementById('authMsg');
+      var btn = document.getElementById('authSubmitBtn');
+      var email = document.getElementById('authEmail').value.trim();
+      var pw = document.getElementById('authPw').value;
+      btn.disabled = true;
+      if (authMode === 'signup') {
+        sb.auth.signUp({ email: email, password: pw }).then(function(res){
+          btn.disabled = false;
+          if (res.error) {
+            msgEl.textContent = '가입에 실패했어요: ' + res.error.message;
+            msgEl.className = 'modal-msg err';
+            return;
+          }
+          if (res.data.session) {
+            msgEl.textContent = '가입 완료! 바로 로그인됐어요.';
+            msgEl.className = 'modal-msg ok';
+            setTimeout(closeAuthModal, 1200);
+          } else {
+            msgEl.textContent = '가입 확인 이메일을 보냈어요. 메일함을 확인해주세요.';
+            msgEl.className = 'modal-msg ok';
+          }
+        });
+      } else {
+        sb.auth.signInWithPassword({ email: email, password: pw }).then(function(res){
+          btn.disabled = false;
+          if (res.error) {
+            msgEl.textContent = '로그인에 실패했어요: ' + res.error.message;
+            msgEl.className = 'modal-msg err';
+            return;
+          }
+          msgEl.textContent = '로그인 완료!';
+          msgEl.className = 'modal-msg ok';
+          setTimeout(closeAuthModal, 800);
+        });
+      }
+    });
+
+    sb.auth.onAuthStateChange(function(event, session){
+      currentUser = session ? session.user : null;
+      renderAuthArea();
+      if (currentUser) {
+        var nameInput = document.getElementById('ordName');
+        var contactInput = document.getElementById('ordContact');
+        if (contactInput && !contactInput.value) contactInput.value = currentUser.email;
+      }
+    });
+
+    sb.auth.getSession().then(function(res){
+      currentUser = res.data.session ? res.data.session.user : null;
+      renderAuthArea();
+    });
+  } else {
+    renderAuthArea();
+  }
 
   buildRing();
   buildGrid();
