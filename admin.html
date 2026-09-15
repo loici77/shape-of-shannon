@@ -1,0 +1,281 @@
+<title>Shape of Shannon's — 관리자</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;0,9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#EAF4FC; --bg-alt:#D8EAFA; --surface:#FFFFFF; --surface-2:#F5FAFE;
+    --ink:#0F2438; --ink-soft:#43607A; --ink-faint:#7C93A6; --line:#CBE1F2;
+    --accent:#FF6B4A; --accent-2:#E85B3B; --accent-soft:#FFE4DB; --accent-ink:#7A2A16;
+    --ok:#1a7a4a; --ok-soft:#DFF5E9;
+    --shadow: 0 30px 60px -20px rgba(15,36,56,.25);
+    --font-display:'Fraunces','Noto Serif KR',serif;
+    --font-body:'Manrope','Pretendard','Apple SD Gothic Neo',sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--font-body);min-height:100vh;}
+  h1,h2{font-family:var(--font-display);margin:0;text-wrap:balance;}
+  button{font-family:var(--font-body);cursor:pointer;}
+  a{color:var(--accent-2);}
+
+  /* ---------- LOGIN ---------- */
+  .login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;}
+  .login-card{
+    width:100%;max-width:380px;background:var(--surface);border:1px solid var(--line);
+    border-radius:20px;box-shadow:var(--shadow);padding:32px 30px;
+  }
+  .login-card h1{font-size:24px;font-weight:600;margin-bottom:4px;}
+  .login-sub{font-size:13px;color:var(--ink-soft);margin-bottom:22px;}
+  .field{margin-bottom:13px;}
+  .field label{display:block;font-size:12px;font-weight:700;color:var(--ink-soft);margin-bottom:5px;}
+  .field input{
+    width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--line);
+    background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:14px;box-sizing:border-box;
+  }
+  .primary-btn{
+    width:100%;margin-top:8px;padding:11px;border-radius:9px;border:none;
+    background:var(--accent);color:#fff;font-weight:700;font-size:14px;transition:background .15s;
+  }
+  .primary-btn:hover{background:var(--accent-2);}
+  .primary-btn:disabled{opacity:.6;cursor:default;}
+  .switch-mode{text-align:center;font-size:12.5px;color:var(--ink-soft);margin-top:16px;}
+  .switch-mode a{cursor:pointer;font-weight:700;text-decoration:none;}
+  .auth-msg{font-size:12.5px;margin-top:12px;text-align:center;}
+  .auth-msg.err{color:var(--accent-2);}
+  .auth-msg.ok{color:var(--ok);}
+
+  /* ---------- DASHBOARD ---------- */
+  .dash-nav{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:18px 28px;border-bottom:1px solid var(--line);background:var(--surface);
+  }
+  .dash-brand{font-family:var(--font-display);font-weight:700;font-size:19px;}
+  .logout-btn{
+    background:none;border:1px solid var(--line);border-radius:8px;padding:7px 14px;
+    font-size:13px;color:var(--ink-soft);font-weight:600;
+  }
+  .logout-btn:hover{border-color:var(--accent);color:var(--accent-2);}
+  .dash-wrap{max-width:1000px;margin:0 auto;padding:28px;}
+  .dash-head{display:flex;align-items:baseline;gap:10px;margin-bottom:18px;}
+  .dash-head h2{font-size:22px;font-weight:600;}
+  .dash-count{font-size:13px;color:var(--ink-faint);}
+
+  .banner{
+    background:var(--ok-soft);color:var(--ok);border:1px solid var(--ok);
+    border-radius:10px;padding:12px 16px;margin-bottom:18px;font-size:13.5px;font-weight:700;
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+  }
+  .banner button{background:none;border:none;color:var(--ok);font-weight:700;font-size:16px;padding:0;}
+
+  .orders-list{display:flex;flex-direction:column;gap:12px;}
+  .order-card{
+    background:var(--surface);border:1px solid var(--line);border-radius:14px;
+    padding:16px 18px;display:grid;grid-template-columns:1fr auto;gap:10px 16px;align-items:start;
+  }
+  .order-card.is-new{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+  .o-board{font-weight:700;font-size:14.5px;}
+  .o-meta{font-size:12px;color:var(--ink-faint);margin-top:2px;}
+  .o-contact{font-size:13px;color:var(--ink-soft);margin-top:6px;}
+  .o-msg{font-size:13px;color:var(--ink-soft);margin-top:6px;line-height:1.5;}
+  .o-status{
+    padding:7px 10px;border-radius:8px;border:1px solid var(--line);background:var(--bg);
+    font-size:12.5px;font-weight:700;color:var(--ink);font-family:var(--font-body);
+  }
+  .empty-msg{color:var(--ink-faint);font-size:13.5px;padding:30px 0;text-align:center;}
+  [hidden]{display:none!important;}
+</style>
+
+<div class="login-wrap" id="loginView">
+  <div class="login-card">
+    <h1>Shape of Shannon's</h1>
+    <p class="login-sub" id="modeSub">관리자 로그인</p>
+
+    <form id="loginForm">
+      <div class="field"><label for="liEmail">이메일</label><input type="email" id="liEmail" required autocomplete="username"></div>
+      <div class="field"><label for="liPw">비밀번호</label><input type="password" id="liPw" required autocomplete="current-password"></div>
+      <button type="submit" class="primary-btn" id="loginBtn">로그인</button>
+    </form>
+
+    <form id="signupForm" hidden>
+      <div class="field"><label for="suEmail">이메일</label><input type="email" id="suEmail" required autocomplete="username"></div>
+      <div class="field"><label for="suPw">비밀번호 (6자 이상)</label><input type="password" id="suPw" required minlength="6" autocomplete="new-password"></div>
+      <button type="submit" class="primary-btn" id="signupBtn">계정 만들기</button>
+    </form>
+
+    <p class="switch-mode" id="switchToSignup">아직 계정이 없으신가요? <a onclick="setMode('signup')">계정 만들기</a></p>
+    <p class="switch-mode" id="switchToLogin" hidden>이미 계정이 있으신가요? <a onclick="setMode('login')">로그인</a></p>
+    <div class="auth-msg" id="authMsg"></div>
+  </div>
+</div>
+
+<div id="dashView" hidden>
+  <nav class="dash-nav">
+    <div class="dash-brand">Shape of Shannon's · 관리자</div>
+    <button class="logout-btn" onclick="doLogout()">로그아웃</button>
+  </nav>
+  <div class="dash-wrap">
+    <div class="banner" id="newOrderBanner" hidden>
+      <span id="newOrderText">🔔 새 문의가 들어왔어요</span>
+      <button onclick="dismissBanner()" aria-label="닫기">×</button>
+    </div>
+    <div class="dash-head">
+      <h2>구매 문의</h2>
+      <span class="dash-count" id="orderCount"></span>
+    </div>
+    <div class="orders-list" id="ordersList"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+(function(){
+  var SUPABASE_URL = 'https://wzgzyycamyvkjhbpqdox.supabase.co';
+  var SUPABASE_ANON_KEY = 'sb_publishable_MiqutEwYnwRyPoNWFwqPPQ_xIriOigw';
+  var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  var BOARD_NAMES = {
+    sunrise:'선라이즈 롱보드', midnight:'미드나잇 피시', reef:'리프 브레이커',
+    coral:'코랄 펀보드', deepblue:'딥블루 건', softride:'소프트라이드'
+  };
+  var STATUS_LABEL = { pending:'대기중', contacted:'연락함', completed:'완료', cancelled:'취소' };
+  var ordersById = {};
+  var realtimeChannel = null;
+
+  function setMode(mode){
+    var isSignup = mode === 'signup';
+    document.getElementById('loginForm').hidden = isSignup;
+    document.getElementById('signupForm').hidden = !isSignup;
+    document.getElementById('switchToSignup').hidden = isSignup;
+    document.getElementById('switchToLogin').hidden = !isSignup;
+    document.getElementById('modeSub').textContent = isSignup ? '첫 관리자 계정 만들기' : '관리자 로그인';
+    document.getElementById('authMsg').textContent = '';
+  }
+  window.setMode = setMode;
+
+  function showMsg(text, ok){
+    var el = document.getElementById('authMsg');
+    el.textContent = text;
+    el.className = 'auth-msg ' + (ok ? 'ok' : 'err');
+  }
+
+  document.getElementById('loginForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    var btn = document.getElementById('loginBtn');
+    btn.disabled = true; btn.textContent = '로그인 중...';
+    sb.auth.signInWithPassword({
+      email: document.getElementById('liEmail').value.trim(),
+      password: document.getElementById('liPw').value,
+    }).then(function(res){
+      btn.disabled = false; btn.textContent = '로그인';
+      if (res.error) { showMsg(res.error.message, false); return; }
+      showDashboard();
+    });
+  });
+
+  document.getElementById('signupForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    var btn = document.getElementById('signupBtn');
+    btn.disabled = true; btn.textContent = '만드는 중...';
+    sb.auth.signUp({
+      email: document.getElementById('suEmail').value.trim(),
+      password: document.getElementById('suPw').value,
+    }).then(function(res){
+      btn.disabled = false; btn.textContent = '계정 만들기';
+      if (res.error) { showMsg(res.error.message, false); return; }
+      if (res.data.session) { showDashboard(); return; }
+      setMode('login');
+      showMsg('가입 확인 이메일을 보냈어요. 메일함을 확인하고 링크를 눌러주세요.', true);
+    });
+  });
+
+  window.doLogout = function(){
+    if (realtimeChannel) { sb.removeChannel(realtimeChannel); realtimeChannel = null; }
+    sb.auth.signOut().then(function(){
+      document.getElementById('dashView').hidden = true;
+      document.getElementById('loginView').hidden = false;
+    });
+  };
+
+  window.dismissBanner = function(){
+    document.getElementById('newOrderBanner').hidden = true;
+  };
+
+  function fmtDate(iso){
+    var d = new Date(iso);
+    return (d.getMonth()+1) + '/' + d.getDate() + ' ' + String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+  }
+
+  function renderOrders(rows){
+    ordersById = {};
+    var list = document.getElementById('ordersList');
+    document.getElementById('orderCount').textContent = rows.length + '건';
+    if (!rows.length) {
+      list.innerHTML = '<div class="empty-msg">아직 들어온 문의가 없어요.</div>';
+      return;
+    }
+    list.innerHTML = rows.map(function(o){
+      ordersById[o.id] = o;
+      var boardName = BOARD_NAMES[o.board_id] || o.board_id;
+      return '<div class="order-card" data-id="' + o.id + '">' +
+        '<div>' +
+          '<div class="o-board">' + boardName + '</div>' +
+          '<div class="o-meta">' + fmtDate(o.created_at) + '</div>' +
+          '<div class="o-contact">' + escapeHtml(o.customer_name) + ' · ' + escapeHtml(o.contact) + '</div>' +
+          (o.message ? '<div class="o-msg">' + escapeHtml(o.message) + '</div>' : '') +
+        '</div>' +
+        '<select class="o-status" onchange="updateStatus(\'' + o.id + '\', this.value)">' +
+          Object.keys(STATUS_LABEL).map(function(k){
+            return '<option value="' + k + '"' + (k === o.status ? ' selected' : '') + '>' + STATUS_LABEL[k] + '</option>';
+          }).join('') +
+        '</select>' +
+      '</div>';
+    }).join('');
+  }
+
+  function escapeHtml(s){
+    return String(s).replace(/[&<>"']/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; });
+  }
+
+  window.updateStatus = function(id, status){
+    sb.from('orders').update({ status: status }).eq('id', id).then(function(res){
+      if (res.error) alert('상태 변경 실패: ' + res.error.message);
+    });
+  };
+
+  function loadOrders(){
+    sb.from('orders').select('*').order('created_at', { ascending: false }).then(function(res){
+      if (res.error) { document.getElementById('ordersList').innerHTML = '<div class="empty-msg">문의 목록을 불러오지 못했어요.</div>'; return; }
+      renderOrders(res.data || []);
+    });
+  }
+
+  function subscribeRealtime(){
+    if (realtimeChannel) return;
+    realtimeChannel = sb.channel('orders-admin')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'orders' }, function(payload){
+        var banner = document.getElementById('newOrderBanner');
+        var boardName = BOARD_NAMES[payload.new.board_id] || payload.new.board_id;
+        document.getElementById('newOrderText').textContent = '🔔 새 문의: ' + boardName + ' · ' + payload.new.customer_name;
+        banner.hidden = false;
+        loadOrders();
+      })
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'orders' }, function(){
+        loadOrders();
+      })
+      .subscribe();
+  }
+
+  function showDashboard(){
+    document.getElementById('loginView').hidden = true;
+    document.getElementById('dashView').hidden = false;
+    loadOrders();
+    subscribeRealtime();
+  }
+
+  sb.auth.getSession().then(function(res){
+    if (res.data.session) showDashboard();
+  });
+})();
+</script>
