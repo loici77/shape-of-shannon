@@ -176,7 +176,7 @@
     }).then(function(res){
       btn.disabled = false; btn.textContent = '로그인';
       if (res.error) { showMsg(res.error.message, false); return; }
-      showDashboard();
+      checkAdminAndEnter();
     });
   });
 
@@ -190,7 +190,7 @@
     }).then(function(res){
       btn.disabled = false; btn.textContent = '계정 만들기';
       if (res.error) { showMsg(res.error.message, false); return; }
-      if (res.data.session) { showDashboard(); return; }
+      if (res.data.session) { checkAdminAndEnter(); return; }
       setMode('login');
       showMsg('가입 확인 이메일을 보냈어요. 메일함을 확인하고 링크를 눌러주세요.', true);
     });
@@ -283,8 +283,19 @@
     subscribeRealtime();
   }
 
+  function checkAdminAndEnter(){
+    sb.from('admins').select('user_id').maybeSingle().then(function(res){
+      if (res.error || !res.data) {
+        showMsg('관리자 계정이 아니에요. 담당자에게 문의해주세요.', false);
+        sb.auth.signOut();
+        return;
+      }
+      showDashboard();
+    });
+  }
+
   sb.auth.getSession().then(function(res){
-    if (res.data.session) showDashboard();
+    if (res.data.session) checkAdminAndEnter();
   });
 })();
 </script>
