@@ -83,6 +83,12 @@
     padding:7px 10px;border-radius:8px;border:1px solid var(--line);background:var(--bg);
     font-size:12.5px;font-weight:700;color:var(--ink);font-family:var(--font-body);
   }
+  .o-pay{
+    display:inline-block;margin-top:6px;padding:4px 9px;border-radius:999px;
+    font-size:11.5px;font-weight:700;
+  }
+  .o-pay.paid{background:var(--ok-soft);color:var(--ok);}
+  .o-pay.unpaid{background:var(--bg-alt);color:var(--ink-faint);}
   .empty-msg{color:var(--ink-faint);font-size:13.5px;padding:30px 0;text-align:center;}
   [hidden]{display:none!important;}
 </style>
@@ -224,6 +230,9 @@
           '<div class="o-meta">' + fmtDate(o.created_at) + '</div>' +
           '<div class="o-contact">' + escapeHtml(o.customer_name) + ' · ' + escapeHtml(o.contact) + '</div>' +
           (o.message ? '<div class="o-msg">' + escapeHtml(o.message) + '</div>' : '') +
+          (o.paid
+            ? '<div class="o-pay paid">💳 결제완료' + (o.amount_total ? ' · ' + Number(o.amount_total).toLocaleString('ko-KR') + '원' : '') + '</div>'
+            : (o.stripe_session_id ? '<div class="o-pay unpaid">결제 대기중</div>' : '')) +
         '</div>' +
         '<select class="o-status" onchange="updateStatus(\'' + o.id + '\', this.value)">' +
           Object.keys(STATUS_LABEL).map(function(k){
