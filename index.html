@@ -370,6 +370,8 @@
     flex-wrap:wrap;gap:10px;
   }
   footer .f-brand{font-family:var(--font-display);font-weight:700;color:var(--ink);}
+  footer .f-admin{color:var(--ink-faint);text-decoration:none;font-size:12px;}
+  footer .f-admin:hover{color:var(--accent-2);}
 
   @media (prefers-reduced-motion: reduce){
     *{transition-duration:.01ms !important; animation-duration:.01ms !important;}
@@ -472,7 +474,7 @@
 <footer class="wrap">
   <div class="f-brand">Shape of Shannon's</div>
   <div>Hyeonbuk-myeon, Yangyang, Gangwon-do, South Korea · hello@shapeofshannons.kr</div>
-  <div>© 2026 Shape of Shannon's</div>
+  <div>© 2026 Shape of Shannon's · <a href="admin.html" class="f-admin">Admin</a></div>
 </footer>
 
 <div class="modal-overlay" id="orderModal" hidden>
