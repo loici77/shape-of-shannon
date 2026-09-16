@@ -79,6 +79,12 @@
     border:none;background:none;color:var(--ink-faint);font-size:12.5px;
     cursor:pointer;text-decoration:underline;font-family:var(--font-body);
   }
+  .admin-link{
+    font-size:12px;font-weight:700;color:var(--accent-2);
+    padding:4px 10px;border-radius:999px;background:var(--accent-soft);
+    text-decoration:none;
+  }
+  .admin-link:hover{background:var(--bg-alt);}
 
   /* ---------- HERO ---------- */
   .hero{
@@ -876,9 +882,15 @@
   function renderAuthArea(){
     var area = document.getElementById('authArea');
     if (currentUser) {
-      area.innerHTML = '<div class="auth-user"><span class="who">' + currentUser.email + '</span><button type="button" id="logoutBtn">로그아웃</button></div>';
+      area.innerHTML = '<div class="auth-user"><span class="who">' + currentUser.email + '</span><a href="admin.html" id="adminLink" class="admin-link" hidden>관리자</a><button type="button" id="logoutBtn">로그아웃</button></div>';
       document.getElementById('logoutBtn').addEventListener('click', function(){
         sb.auth.signOut();
+      });
+      sb.from('admins').select('user_id').maybeSingle().then(function(res){
+        if (res.data) {
+          var link = document.getElementById('adminLink');
+          if (link) link.hidden = false;
+        }
       });
     } else {
       area.innerHTML = '<button type="button" class="auth-btn" onclick="openAuthModal(\'login\')">로그인 / 회원가입</button>';
