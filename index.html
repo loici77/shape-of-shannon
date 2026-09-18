@@ -187,12 +187,13 @@
     filter:brightness(1) saturate(1);
     opacity:1;
   }
-  .board-card svg{
+  .board-card svg, .board-card img{
     width:100%;height:100%;
+    object-fit:contain;
     filter:drop-shadow(0 18px 26px rgba(10,25,35,.28));
     transition:transform .35s ease;
   }
-  .board-card.is-active svg{ transform:scale(1.5); }
+  .board-card.is-active svg, .board-card.is-active img{ transform:scale(1.5); }
 
   .hint{
     text-align:center;
@@ -357,7 +358,7 @@
     transition:border-color .2s, transform .2s;
   }
   .g-card:hover{border-color:var(--accent);transform:translateY(-3px);}
-  .g-card svg{width:76px;height:auto;margin-bottom:14px;filter:drop-shadow(0 10px 16px rgba(10,25,35,.2));}
+  .g-card svg, .g-card img{width:76px;height:170px;object-fit:contain;margin-bottom:14px;filter:drop-shadow(0 10px 16px rgba(10,25,35,.2));}
   .g-name{font-family:var(--font-display);font-weight:600;font-size:17px;margin-bottom:4px;}
   .g-type{font-size:12px;color:var(--ink-faint);margin-bottom:10px;}
   .g-price{font-weight:800;font-size:15px;color:var(--accent-2);font-variant-numeric:tabular-nums;}
@@ -593,7 +594,17 @@
     swallow:'M50,4 C32,4 13,40 10,88 L10,225 C10,255 24,272 34,283 L41,262 L50,282 L59,262 L66,283 C76,272 90,255 90,225 L90,88 C87,40 68,4 50,4 Z'
   };
 
+  // Boards with a real product photo instead of a flat vector illustration —
+  // keyed by board id so it still applies even after Supabase overwrites BOARDS.
+  var BOARD_PHOTOS = {
+    reef: 'board-photo-reef.png'
+  };
+
   function boardSVG(b){
+    var photo = BOARD_PHOTOS[b.id];
+    if (photo) {
+      return '<img src="' + photo + '" alt="' + b.name + '">';
+    }
     var d = TAILS[b.tail] || TAILS.round;
     return '' +
       '<svg viewBox="0 0 100 300" xmlns="http://www.w3.org/2000/svg">' +
