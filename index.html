@@ -1,3 +1,18 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Hand-shaped surfboards from Yangyang, Korea. Take the helm, spin the lineup, and find the board that fits your wave.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Shape of Shannon's">
+<meta property="og:title" content="Shape of Shannon's">
+<meta property="og:description" content="Hand-shaped surfboards from Yangyang, Korea. Take the helm and find yours.">
+<meta property="og:url" content="https://loici77.github.io/shape-of-shannon/">
+<meta property="og:image" content="https://loici77.github.io/shape-of-shannon/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <title>Shape of Shannon's</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -205,20 +220,27 @@
   .hint.hidden{opacity:0;}
 
   .nav-arrows{
-    display:flex;justify-content:center;gap:14px;margin-top:6px;
+    display:flex;flex-direction:column;align-items:center;gap:12px;margin-top:10px;
   }
-  .arrow-btn{
-    width:40px;height:40px;border-radius:50%;
+  .helm{
+    width:124px;height:124px;border-radius:50%;padding:0;
     border:1px solid var(--line);
     background:var(--surface);
     color:var(--ink);
-    font-size:18px;
     display:flex;align-items:center;justify-content:center;
-    cursor:pointer;
-    transition:border-color .15s, transform .15s, background .15s;
+    cursor:grab;touch-action:none;-webkit-user-select:none;user-select:none;
+    transition:border-color .15s, color .15s;
   }
-  .arrow-btn:hover{border-color:var(--accent);color:var(--accent-2);transform:translateY(-1px);}
-  .arrow-btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+  .helm:hover{border-color:var(--accent);color:var(--accent-2);}
+  .helm.steering{cursor:grabbing;border-color:var(--accent);color:var(--accent-2);}
+  .helm:focus-visible{outline:2px solid var(--accent);outline-offset:3px;}
+  .helm svg{
+    width:92px;height:92px;fill:none;stroke:currentColor;stroke-width:1.1;stroke-linecap:round;
+    transform:rotate(var(--turn,0deg));will-change:transform;pointer-events:none;
+  }
+  .helm.snapping svg{transition:transform .6s cubic-bezier(.2,.8,.2,1);}
+  @media (prefers-reduced-motion:reduce){.helm.snapping svg{transition:none;}}
+  @media (max-width:520px){.helm{width:102px;height:102px}.helm svg{width:76px;height:76px}}
 
   /* ---------- DETAIL PANEL ---------- */
   .detail{
@@ -234,6 +256,31 @@
     display:flex;align-items:flex-start;justify-content:space-between;gap:16px;
     margin-bottom:10px;
   }
+  .stage-caption{
+    position:absolute;left:0;right:0;bottom:0;z-index:5;
+    padding:64px max(16px,env(safe-area-inset-left,0px)) 26px;
+    text-align:center;color:#fff;pointer-events:none;opacity:0;
+    background:linear-gradient(to top,
+      rgba(6,30,38,.58) 0%, rgba(6,30,38,.30) 45%, rgba(6,30,38,0) 100%);
+  }
+  .stage-caption .cap-name{
+    font-family:var(--font-display);font-weight:600;
+    font-size:clamp(20px,3.2vw,30px);line-height:1.15;margin-bottom:7px;
+    text-shadow:0 1px 16px rgba(0,0,0,.45);
+  }
+  .stage-caption .cap-blurb{
+    font-family:var(--font-body);font-size:clamp(12px,1.45vw,14.5px);line-height:1.55;
+    max-width:46ch;margin:0 auto;opacity:.93;
+    text-shadow:0 1px 12px rgba(0,0,0,.5);
+  }
+  .stage-caption.show{animation:capIn .6s cubic-bezier(.2,.8,.2,1) forwards;}
+  @keyframes capIn{
+    from{opacity:0;transform:translateY(12px)}
+    to{opacity:1;transform:none}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .stage-caption.show{animation:none;opacity:1;transform:none;}
+  }
   .detail-name{font-family:var(--font-display);font-size:26px;font-weight:600;}
   .detail-price{font-family:var(--font-body);font-weight:800;font-size:20px;color:var(--accent-2);white-space:nowrap;font-variant-numeric:tabular-nums;}
   .detail-tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
@@ -243,7 +290,6 @@
     background:var(--accent-soft);color:var(--accent-ink);
   }
   .tag.alt{background:var(--bg-alt);color:var(--ink-soft);}
-  .detail-blurb{color:var(--ink-soft);font-size:14.5px;line-height:1.7;margin-bottom:16px;}
   .spec-grid{
     display:grid;grid-template-columns:repeat(4,1fr);
     gap:12px;
@@ -379,6 +425,8 @@
     *{transition-duration:.01ms !important; animation-duration:.01ms !important;}
   }
 </style>
+</head>
+<body>
 
 <nav class="nav">
   <div class="brand"><span class="dot"></span>Shape of Shannon's</div>
@@ -396,7 +444,7 @@
   <div class="wrap">
     <div class="eyebrow">Hand-shaped in Yangyang</div>
     <h1>Spin it around, find the wave that's <em>just right</em></h1>
-    <p class="hero-sub">Grab a board with your mouse and give it a spin. The board facing you scales up automatically, with its specs and price shown below.</p>
+    <p class="hero-sub">Six boards, hand-shaped one at a time. Take the helm and find yours.</p>
   </div>
 
   <div class="carousel-section wrap">
@@ -415,11 +463,12 @@
       </svg>
       <div class="platform"></div>
       <div class="ring" id="ring"></div>
+      <div class="stage-caption" id="stageCaption" aria-hidden="true"></div>
     </div>
     <p class="hint" id="hint">← Drag to spin →</p>
     <div class="nav-arrows">
-      <button class="arrow-btn" id="prevBtn" aria-label="Previous board">‹</button>
-      <button class="arrow-btn" id="nextBtn" aria-label="Next board">›</button>
+      <div class="helm" id="helm" role="slider" tabindex="0"
+           aria-label="Steer through the boards" aria-valuemin="1" aria-valuenow="1"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6.4"/><circle cx="12" cy="12" r="2.2" fill="currentColor" stroke="none"/><path d="M14.6 12h6.8M9.4 12H2.6M12 14.6v6.8M12 9.4V2.6M13.84 13.84l4.81 4.81M10.16 10.16L5.35 5.35M10.16 13.84l-4.81 4.81M13.84 10.16l4.81-4.81"/><circle cx="21.4" cy="12" r=".9" fill="currentColor" stroke="none"/><circle cx="2.6" cy="12" r=".9" fill="currentColor" stroke="none"/><circle cx="12" cy="21.4" r=".9" fill="currentColor" stroke="none"/><circle cx="12" cy="2.6" r=".9" fill="currentColor" stroke="none"/><circle cx="18.65" cy="18.65" r=".9" fill="currentColor" stroke="none"/><circle cx="5.35" cy="5.35" r=".9" fill="currentColor" stroke="none"/><circle cx="5.35" cy="18.65" r=".9" fill="currentColor" stroke="none"/><circle cx="18.65" cy="5.35" r=".9" fill="currentColor" stroke="none"/></svg></div>
     </div>
 
     <div class="detail" id="detail"></div>
@@ -594,12 +643,11 @@
     swallow:'M50,4 C32,4 13,40 10,88 L10,225 C10,255 24,272 34,283 L41,262 L50,282 L59,262 L66,283 C76,272 90,255 90,225 L90,88 C87,40 68,4 50,4 Z'
   };
 
-  // Boards with a real product photo instead of a flat vector illustration —
-  // keyed by board id so it still applies even after Supabase overwrites BOARDS.
-  var BOARD_PHOTOS = {
-    reef: 'board-photo-reef.png',
-    coral: 'board-photo-coral.png'
-  };
+  // Real product photos, keyed by board id so they survive a Supabase refresh.
+  // Empty on purpose: the lineup runs on illustrations until a photo exists for
+  // every board — a mix of two photos and four drawings reads as unfinished.
+  // To switch back, add an entry per board, e.g. reef: 'board-photo-reef.png'.
+  var BOARD_PHOTOS = {};
 
   function boardSVG(b){
     var photo = BOARD_PHOTOS[b.id];
@@ -680,6 +728,7 @@
       activeIndex = bestI;
       renderDetail();
     }
+    if (helmSvg) paintHelm();
   }
 
   function renderDetail(){
@@ -694,7 +743,6 @@
         '<span class="tag">' + b.type + '</span>' +
         '<span class="tag alt">' + b.level + '</span>' +
       '</div>' +
-      '<p class="detail-blurb">' + b.blurb + '</p>' +
       '<div class="spec-grid">' +
         '<div><span class="spec-label">Length</span><span class="spec-val">' + b.length + '</span></div>' +
         '<div><span class="spec-label">Width</span><span class="spec-val">' + b.width + '</span></div>' +
@@ -705,6 +753,20 @@
         '<button type="button" class="order-btn" onclick="openOrderModal()">📩 Inquire</button>' +
         '<button type="button" class="pay-btn" onclick="openPayModal()">💳 Pay by Card</button>' +
       '</div>';
+    paintCaption();
+  }
+
+  // White caption over the water, replayed each time a new board comes to the front.
+  var stageCaption = document.getElementById('stageCaption');
+  function paintCaption(){
+    if (!stageCaption) return;
+    var b = BOARDS[activeIndex];
+    stageCaption.innerHTML =
+      '<div class="cap-name">' + b.name + '</div>' +
+      '<div class="cap-blurb">' + b.blurb + '</div>';
+    stageCaption.classList.remove('show');
+    void stageCaption.offsetWidth; // force reflow so the animation restarts
+    stageCaption.classList.add('show');
   }
 
   function angleToIndex(i){
@@ -717,6 +779,7 @@
 
   function goTo(i){
     rotation = angleToIndex(i);
+    if (helm) helm.classList.add('snapping');
     ring.style.transition = reduceMotion ? 'none' : 'transform .6s cubic-bezier(.2,.8,.2,1)';
     render();
     setTimeout(function(){ ring.style.transition = ''; }, 620);
@@ -775,11 +838,50 @@
   window.addEventListener('pointerup', pointerUp);
   stage.addEventListener('pointerleave', function(e){ if (e.buttons === 0) pointerUp(); });
 
-  document.getElementById('prevBtn').addEventListener('click', function(){
-    goTo((activeIndex - 1 + N) % N);
+  // ---- helm: one wheel, steered by dragging ----
+  var helm = document.getElementById('helm');
+  var helmSvg = helm.querySelector('svg');
+  var steering = false, lastHelmAngle = 0;
+  helm.setAttribute('aria-valuemax', String(N));
+
+  function helmAngleAt(e){
+    var r = helm.getBoundingClientRect();
+    return Math.atan2(e.clientY - (r.top + r.height / 2),
+                      e.clientX - (r.left + r.width / 2)) * 180 / Math.PI;
+  }
+  function paintHelm(){
+    helmSvg.style.setProperty('--turn', (-rotation) + 'deg');
+    helm.setAttribute('aria-valuenow', String(activeIndex + 1));
+    helm.setAttribute('aria-valuetext', BOARDS[activeIndex].name);
+  }
+  helm.addEventListener('pointerdown', function(e){
+    steering = true;
+    lastHelmAngle = helmAngleAt(e);
+    helm.classList.add('steering');
+    helm.classList.remove('snapping');
+    if (inertiaRAF) { cancelAnimationFrame(inertiaRAF); inertiaRAF = null; }
+    ring.style.transition = '';
+    if (helm.setPointerCapture && e.pointerId != null) helm.setPointerCapture(e.pointerId);
+    e.preventDefault();
   });
-  document.getElementById('nextBtn').addEventListener('click', function(){
-    goTo((activeIndex + 1) % N);
+  helm.addEventListener('pointermove', function(e){
+    if (!steering) return;
+    var a = helmAngleAt(e);
+    rotation -= normalizeAngleDiff(a - lastHelmAngle); // clockwise -> next board
+    lastHelmAngle = a;
+    render();
+  });
+  function helmRelease(){
+    if (!steering) return;
+    steering = false;
+    helm.classList.remove('steering');
+    goTo(activeIndex);
+  }
+  helm.addEventListener('pointerup', helmRelease);
+  helm.addEventListener('pointercancel', helmRelease);
+  helm.addEventListener('keydown', function(e){
+    if (e.key === 'ArrowLeft')  { goTo((activeIndex - 1 + N) % N); e.preventDefault(); }
+    if (e.key === 'ArrowRight') { goTo((activeIndex + 1) % N); e.preventDefault(); }
   });
   document.addEventListener('keydown', function(e){
     if (e.key === 'ArrowLeft') goTo((activeIndex - 1 + N) % N);
@@ -1064,3 +1166,5 @@
   }
 })();
 </script>
+</body>
+</html>
