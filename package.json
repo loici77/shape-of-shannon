@@ -1,0 +1,12 @@
+{
+  "name": "shape-of-shannon",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Shape of Shannon's - hand-shaped surfboards",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
