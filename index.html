@@ -273,6 +273,19 @@
     max-width:46ch;margin:0 auto;opacity:.93;
     text-shadow:0 1px 12px rgba(0,0,0,.5);
   }
+  .stage-caption .cap-meta{
+    display:flex;align-items:baseline;justify-content:center;flex-wrap:wrap;
+    gap:6px 14px;margin-top:10px;
+    text-shadow:0 1px 12px rgba(0,0,0,.55);
+  }
+  .stage-caption .cap-price{
+    font-family:var(--font-body);font-weight:800;
+    font-size:clamp(15px,1.95vw,19px);font-variant-numeric:tabular-nums;
+  }
+  .stage-caption .cap-specs{
+    font-family:var(--font-body);font-size:clamp(11px,1.25vw,13px);
+    letter-spacing:.03em;opacity:.84;font-variant-numeric:tabular-nums;
+  }
   .stage-caption.show{animation:capIn .6s cubic-bezier(.2,.8,.2,1) forwards;}
   @keyframes capIn{
     from{opacity:0;transform:translateY(12px)}
@@ -283,7 +296,12 @@
   }
   .detail-name{font-family:var(--font-display);font-size:26px;font-weight:600;}
   .detail-price{font-family:var(--font-body);font-weight:800;font-size:20px;color:var(--accent-2);white-space:nowrap;font-variant-numeric:tabular-nums;}
-  .detail-tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;}
+  .detail-tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+  /* Board description, repeated here so the specs card reads on its own without scrolling. */
+  .detail-blurb{
+    font-family:var(--font-body);font-size:14px;line-height:1.65;
+    color:var(--ink-soft);margin:0 0 16px;max-width:62ch;
+  }
   .tag{
     font-size:11px;font-weight:700;letter-spacing:.02em;
     padding:5px 10px;border-radius:999px;
@@ -435,6 +453,8 @@
       <a href="#carousel">Choose a Board</a>
       <a href="#story">Our Story</a>
       <a href="#lineup">Full Lineup</a>
+      <a href="board.html">Q&amp;A</a>
+      <a href="#" id="adminTab" onclick="openAdminGate(event)">Admin</a>
     </div>
     <div id="authArea"></div>
   </div>
@@ -574,6 +594,24 @@
         <button type="submit" class="modal-submit" id="authSubmitBtn">Log In</button>
       </div>
       <div class="modal-msg" id="authMsg"></div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-overlay" id="adminGateModal" hidden>
+  <div class="modal-box">
+    <h3>Admin</h3>
+    <p class="modal-sub">Enter the passcode to open the admin page.</p>
+    <form id="adminGateForm">
+      <div class="modal-field">
+        <label for="adminGatePw">Passcode</label>
+        <input type="password" id="adminGatePw" inputmode="numeric" autocomplete="off" required>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="modal-cancel" onclick="closeAdminGate()">Cancel</button>
+        <button type="submit" class="modal-submit">Enter</button>
+      </div>
+      <div class="modal-msg" id="adminGateMsg"></div>
     </form>
   </div>
 </div>
@@ -743,6 +781,7 @@
         '<span class="tag">' + b.type + '</span>' +
         '<span class="tag alt">' + b.level + '</span>' +
       '</div>' +
+      '<div class="detail-blurb">' + b.blurb + '</div>' +
       '<div class="spec-grid">' +
         '<div><span class="spec-label">Length</span><span class="spec-val">' + b.length + '</span></div>' +
         '<div><span class="spec-label">Width</span><span class="spec-val">' + b.width + '</span></div>' +
@@ -763,7 +802,11 @@
     var b = BOARDS[activeIndex];
     stageCaption.innerHTML =
       '<div class="cap-name">' + b.name + '</div>' +
-      '<div class="cap-blurb">' + b.blurb + '</div>';
+      '<div class="cap-blurb">' + b.blurb + '</div>' +
+      '<div class="cap-meta">' +
+        '<span class="cap-price">' + fmtWon(b.price) + '</span>' +
+        '<span class="cap-specs">' + b.length + ' × ' + b.width + ' × ' + b.thick + ' · ' + b.volume + '</span>' +
+      '</div>';
     stageCaption.classList.remove('show');
     void stageCaption.offsetWidth; // force reflow so the animation restarts
     stageCaption.classList.add('show');
@@ -994,6 +1037,43 @@
   });
   document.addEventListener('keydown', function(e){
     if (e.key === 'Escape' && !document.getElementById('authModal').hidden) closeAuthModal();
+  });
+
+  // ── Admin tab gate ────────────────────────────────────────────────────
+  // This passcode only hides the entrance and is readable in page source.
+  // Actual protection stays with admin.html: Supabase Auth + admins table + RLS.
+  var ADMIN_GATE_CODE = '5971';
+  function openAdminGate(e){
+    if (e) e.preventDefault();
+    document.getElementById('adminGateModal').hidden = false;
+    document.getElementById('adminGateMsg').textContent = '';
+    var pw = document.getElementById('adminGatePw');
+    pw.value = '';
+    pw.focus();
+  }
+  function closeAdminGate(){ document.getElementById('adminGateModal').hidden = true; }
+  // inline onclick runs in global scope, so expose these like the other modal handlers
+  window.openAdminGate = openAdminGate;
+  window.closeAdminGate = closeAdminGate;
+  document.getElementById('adminGateForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    var msgEl = document.getElementById('adminGateMsg');
+    var pw = document.getElementById('adminGatePw');
+    if (pw.value === ADMIN_GATE_CODE) {
+      msgEl.className = 'modal-msg ok';
+      msgEl.textContent = 'Opening admin…';
+      location.href = 'admin.html';
+    } else {
+      msgEl.className = 'modal-msg err';
+      msgEl.textContent = 'Wrong passcode.';
+      pw.select();
+    }
+  });
+  document.getElementById('adminGateModal').addEventListener('click', function(e){
+    if (e.target === this) closeAdminGate();
+  });
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && !document.getElementById('adminGateModal').hidden) closeAdminGate();
   });
 
   function renderAuthArea(){

@@ -52,6 +52,13 @@
   .auth-msg{font-size:12.5px;margin-top:12px;text-align:center;}
   .auth-msg.err{color:var(--accent-2);}
   .auth-msg.ok{color:var(--ok);}
+  .home-link{
+    display:block;text-align:center;margin-top:18px;padding:10px;
+    font-size:12.5px;font-weight:700;color:var(--ink-soft);text-decoration:none;
+    border:1px solid var(--line);border-radius:9px;
+    transition:border-color .15s,color .15s,background .15s;
+  }
+  .home-link:hover{border-color:var(--accent);color:var(--accent-2);background:var(--bg);}
 
   /* ---------- DASHBOARD ---------- */
   .dash-nav{
@@ -64,7 +71,31 @@
     font-size:13px;color:var(--ink-soft);font-weight:600;
   }
   .logout-btn:hover{border-color:var(--accent);color:var(--accent-2);}
+  .dash-nav-right{display:flex;align-items:center;gap:8px;}
+  .dash-home{
+    border:1px solid var(--line);border-radius:8px;padding:7px 14px;
+    font-size:13px;color:var(--ink-soft);font-weight:600;text-decoration:none;
+    transition:border-color .15s,color .15s;
+  }
+  .dash-home:hover{border-color:var(--accent);color:var(--accent-2);}
   .dash-wrap{max-width:1000px;margin:0 auto;padding:28px;}
+  .dash-tabs{display:flex;gap:6px;margin-bottom:20px;background:var(--bg-alt);padding:4px;border-radius:10px;width:fit-content;}
+  .dash-tab{
+    padding:8px 18px;border:none;border-radius:8px;background:none;cursor:pointer;
+    font-family:var(--font-body);font-size:13.5px;font-weight:700;color:var(--ink-soft);
+  }
+  .dash-tab.active{background:var(--surface);color:var(--ink);box-shadow:0 2px 6px rgba(10,25,35,.08);}
+  .members-list{display:flex;flex-direction:column;gap:10px;}
+  .member-card{
+    background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;
+    display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;
+  }
+  .m-email{font-weight:700;font-size:14px;}
+  .m-meta{font-size:12px;color:var(--ink-faint);margin-top:3px;}
+  .m-tags{display:flex;gap:6px;align-items:center;flex-wrap:wrap;}
+  .m-tag{font-size:11px;font-weight:700;padding:3px 9px;border-radius:999px;background:var(--bg-alt);color:var(--ink-soft);}
+  .m-tag.admin{background:var(--accent-soft);color:var(--accent-ink);}
+  .m-tag.unconfirmed{background:#FFF0D6;color:#8A5A00;}
   .dash-head{display:flex;align-items:baseline;gap:10px;margin-bottom:18px;}
   .dash-head h2{font-size:22px;font-weight:600;}
   .dash-count{font-size:13px;color:var(--ink-faint);}
@@ -122,24 +153,43 @@
     <p class="switch-mode" id="switchToSignup">아직 계정이 없으신가요? <a onclick="setMode('signup')">계정 만들기</a></p>
     <p class="switch-mode" id="switchToLogin" hidden>이미 계정이 있으신가요? <a onclick="setMode('login')">로그인</a></p>
     <div class="auth-msg" id="authMsg"></div>
+    <a href="index.html" class="home-link">← 홈으로</a>
   </div>
 </div>
 
 <div id="dashView" hidden>
   <nav class="dash-nav">
     <div class="dash-brand">Shape of Shannon's · 관리자</div>
-    <button class="logout-btn" onclick="doLogout()">로그아웃</button>
+    <div class="dash-nav-right">
+      <a href="index.html" class="dash-home">← 홈으로</a>
+      <button class="logout-btn" onclick="doLogout()">로그아웃</button>
+    </div>
   </nav>
   <div class="dash-wrap">
     <div class="banner" id="newOrderBanner" hidden>
       <span id="newOrderText">🔔 새 문의가 들어왔어요</span>
       <button onclick="dismissBanner()" aria-label="닫기">×</button>
     </div>
-    <div class="dash-head">
-      <h2>구매 문의</h2>
-      <span class="dash-count" id="orderCount"></span>
+    <div class="dash-tabs">
+      <button type="button" class="dash-tab active" id="tabOrders" onclick="setDashTab('orders')">구매 문의</button>
+      <button type="button" class="dash-tab" id="tabMembers" onclick="setDashTab('members')">회원</button>
     </div>
-    <div class="orders-list" id="ordersList"></div>
+
+    <div id="paneOrders">
+      <div class="dash-head">
+        <h2>구매 문의</h2>
+        <span class="dash-count" id="orderCount"></span>
+      </div>
+      <div class="orders-list" id="ordersList"></div>
+    </div>
+
+    <div id="paneMembers" hidden>
+      <div class="dash-head">
+        <h2>회원</h2>
+        <span class="dash-count" id="memberCount"></span>
+      </div>
+      <div class="members-list" id="membersList"></div>
+    </div>
   </div>
 </div>
 
@@ -283,6 +333,48 @@
         loadOrders();
       })
       .subscribe();
+  }
+
+  // ── 회원 탭 ──
+  // auth.users 는 anon 키로 못 읽는다. 관리자만 통과하는 DB 함수로만 가져온다.
+  var _membersLoaded = false;
+
+  window.setDashTab = function(tab){
+    var isM = tab === 'members';
+    document.getElementById('tabOrders').classList.toggle('active', !isM);
+    document.getElementById('tabMembers').classList.toggle('active', isM);
+    document.getElementById('paneOrders').hidden = isM;
+    document.getElementById('paneMembers').hidden = !isM;
+    if (isM && !_membersLoaded) loadMembers();
+  };
+
+  function loadMembers(){
+    var list = document.getElementById('membersList');
+    list.innerHTML = '<div class="empty-msg">불러오는 중...</div>';
+    sb.rpc('admin_list_members').then(function(res){
+      if (res.error) {
+        list.innerHTML = '<div class="empty-msg">회원 목록을 불러오지 못했어요: ' + escapeHtml(res.error.message) + '</div>';
+        return;
+      }
+      _membersLoaded = true;
+      var rows = res.data || [];
+      document.getElementById('memberCount').textContent = rows.length + '명';
+      if (!rows.length) { list.innerHTML = '<div class="empty-msg">가입한 회원이 없어요.</div>'; return; }
+      list.innerHTML = rows.map(function(m){
+        var tags = '';
+        if (m.is_admin) tags += '<span class="m-tag admin">관리자</span>';
+        if (!m.confirmed) tags += '<span class="m-tag unconfirmed">메일 미인증</span>';
+        tags += '<span class="m-tag">글 ' + m.post_count + '건</span>';
+        return '<div class="member-card">' +
+            '<div>' +
+              '<div class="m-email">' + escapeHtml(m.email) + '</div>' +
+              '<div class="m-meta">가입 ' + fmtDate(m.created_at) +
+                ' · 최근 로그인 ' + (m.last_sign_in_at ? fmtDate(m.last_sign_in_at) : '없음') + '</div>' +
+            '</div>' +
+            '<div class="m-tags">' + tags + '</div>' +
+          '</div>';
+      }).join('');
+    });
   }
 
   function showDashboard(){

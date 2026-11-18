@@ -1,0 +1,502 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Questions and answers about Shape of Shannon's hand-shaped surfboards.">
+<meta name="robots" content="index, follow">
+<title>Q&amp;A &middot; Shape of Shannon's</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --bg:#EAF4FC;
+    --bg-alt:#D8EAFA;
+    --surface:#FFFFFF;
+    --surface-2:#F5FAFE;
+    --ink:#0F2438;
+    --ink-soft:#43607A;
+    --ink-faint:#7C93A6;
+    --line:#CBE1F2;
+    --accent:#FF6B4A;
+    --accent-2:#E85B3B;
+    --accent-soft:#FFE4DB;
+    --accent-ink:#7A2A16;
+    --shadow: 0 30px 60px -20px rgba(15,36,56,.25);
+    --sky-top:#BEE6E6; --sky-mid:#FFDDB0; --sea-top:#4FA8A0; --sea-bottom:#123B45;
+    --sun:#FFD27A; --foam:rgba(255,255,255,.65); --foam-soft:rgba(255,255,255,.28);
+    --b1:#F0B24D; --b2:#1F5F63; --b3:#E85B3B; --b4:#F2895A; --b5:#20406A; --b6:#F6E0AE;
+    --font-display:'Fraunces','Noto Serif KR',serif;
+    --font-body:'Manrope','Pretendard','Apple SD Gothic Neo',sans-serif;
+  }
+  /* 이 사이트는 라이트 블루 톤 하나로 고정한다 — 시스템/브라우저가 다크모드여도 배경이
+     항상 밝은 하늘색으로 보이도록 다크모드 분기를 두지 않는다. */
+
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--font-body);
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  h1,h2,h3{font-family:var(--font-display);text-wrap:balance;margin:0;}
+  p{margin:0;}
+  a{color:inherit;}
+  button{font-family:var(--font-body);}
+  ::selection{background:var(--accent);color:#fff;}
+
+  .wrap{max-width:1180px;margin:0 auto;padding:0 28px;}
+
+  /* ---------- NAV ---------- */
+  .nav{
+    position:sticky;top:0;z-index:50;
+    display:flex;align-items:center;justify-content:space-between;
+    padding:20px 28px;
+    background:color-mix(in srgb, var(--bg) 82%, transparent);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  .brand{
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:22px;
+    letter-spacing:.01em;
+    display:flex;align-items:center;gap:8px;
+  }
+  .brand .dot{width:9px;height:9px;border-radius:50%;background:var(--accent);display:inline-block;}
+  .nav-right{display:flex;align-items:center;gap:22px;}
+  .nav-links{display:flex;gap:28px;font-size:14px;font-weight:600;color:var(--ink-soft);}
+  .nav-links a{text-decoration:none;transition:color .15s;}
+  .nav-links a:hover{color:var(--accent-2);}
+  @media (max-width:640px){ .nav-links{display:none;} }
+  .auth-btn{
+    padding:9px 16px;border-radius:999px;border:1px solid var(--line);
+    background:var(--surface);color:var(--ink);font-weight:700;font-size:13px;
+    cursor:pointer;font-family:var(--font-body);transition:border-color .15s,color .15s;
+    white-space:nowrap;
+  }
+  .auth-btn:hover{border-color:var(--accent);color:var(--accent-2);}
+  .auth-user{display:flex;align-items:center;gap:10px;font-size:13px;color:var(--ink-soft);}
+  .auth-user .who{font-weight:700;color:var(--ink);}
+  .auth-user button{
+    border:none;background:none;color:var(--ink-faint);font-size:12.5px;
+    cursor:pointer;text-decoration:underline;font-family:var(--font-body);
+  }
+  .admin-link{
+    font-size:12px;font-weight:700;color:var(--accent-2);
+    padding:4px 10px;border-radius:999px;background:var(--accent-soft);
+    text-decoration:none;
+  }
+  .admin-link:hover{background:var(--bg-alt);}
+
+  /* ---------- Q&A BOARD ---------- */
+  .board{padding:76px 0 90px;background:var(--surface-2);}
+  .board-head{text-align:center;margin-bottom:28px;}
+  .board-head h2{font-family:var(--font-display);font-size:clamp(26px,3.6vw,34px);font-weight:600;margin-bottom:6px;}
+  .board-head p{color:var(--ink-soft);font-size:14px;}
+  .post-form{
+    background:var(--surface);border:1px solid var(--line);border-radius:16px;
+    padding:18px;margin-bottom:26px;box-shadow:0 10px 30px -22px rgba(15,36,56,.5);
+  }
+  .post-form input,.post-form textarea{
+    width:100%;padding:11px 13px;border-radius:9px;border:1px solid var(--line);
+    background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:14px;
+    box-sizing:border-box;margin-bottom:10px;
+  }
+  .post-form textarea{min-height:92px;resize:vertical;}
+  .post-form-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+  .post-as{font-size:12px;color:var(--ink-faint);}
+  .post-form-foot button{
+    padding:10px 20px;border:none;border-radius:9px;background:var(--accent);
+    color:#fff;font-weight:700;font-size:13.5px;
+  }
+  .post-form-foot button:disabled{opacity:.6;cursor:default;}
+  .post-locked{
+    text-align:center;padding:22px;margin-bottom:26px;
+    background:var(--surface);border:1px dashed var(--line);border-radius:16px;
+  }
+  .post-locked p{font-size:13.5px;color:var(--ink-soft);margin-bottom:12px;}
+  .post-list{display:flex;flex-direction:column;gap:14px;}
+  .post{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px 20px;}
+  .post-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:8px;}
+  .post-head h3{font-family:var(--font-display);font-size:18px;font-weight:600;}
+  .post-meta{font-size:11.5px;color:var(--ink-faint);white-space:nowrap;}
+  .post-body{font-size:14px;line-height:1.7;color:var(--ink-soft);white-space:pre-wrap;}
+  /* 답글은 주황을 뱃지와 왼쪽 바에만 남긴다 — 답글이 쌓여도 화면이 주황으로 덮이지 않게. */
+  .post-reply{margin-top:14px;padding:12px 16px;border-left:3px solid var(--accent);background:#FFF6F3;border-radius:0 10px 10px 0;}
+  .post-reply p{font-size:13.5px;line-height:1.7;color:var(--ink);white-space:pre-wrap;margin:7px 0;}
+  .reply-badge{
+    display:inline-block;font-size:10.5px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;
+    color:#fff;background:var(--accent);padding:3px 8px;border-radius:999px;
+  }
+  .reply-form{display:flex;gap:8px;margin-top:14px;align-items:flex-start;}
+  .reply-form textarea{
+    flex:1;min-height:56px;resize:vertical;padding:10px 12px;border-radius:9px;
+    border:1px solid var(--line);background:var(--bg);color:var(--ink);
+    font-family:var(--font-body);font-size:13.5px;box-sizing:border-box;
+  }
+  .reply-form button{
+    padding:10px 16px;border:none;border-radius:9px;background:var(--accent);
+    color:#fff;font-weight:700;font-size:13px;white-space:nowrap;
+  }
+  .post-empty{text-align:center;color:var(--ink-faint);font-size:13.5px;padding:30px;}
+  @media (max-width:640px){
+    .reply-form{flex-direction:column;}
+    .reply-form button{width:100%;}
+  }
+  .modal-overlay{
+    position:fixed;inset:0;background:rgba(10,20,30,.5);
+    display:flex;align-items:center;justify-content:center;padding:20px;
+    z-index:100;
+  }
+  .modal-overlay[hidden]{display:none;}
+  .modal-box{
+    background:var(--surface);border-radius:20px;box-shadow:var(--shadow);
+    max-width:420px;width:100%;padding:26px 26px 22px;
+  }
+  .modal-box h3{font-family:var(--font-display);font-size:21px;font-weight:600;margin-bottom:4px;}
+  .modal-sub{font-size:13px;color:var(--ink-soft);margin-bottom:18px;}
+  .modal-field{margin-bottom:12px;}
+  .modal-field label{display:block;font-size:12px;font-weight:700;color:var(--ink-soft);margin-bottom:5px;}
+  .modal-field input,.modal-field textarea{
+    width:100%;padding:9px 11px;border-radius:8px;border:1px solid var(--line);
+    background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:14px;
+    box-sizing:border-box;
+  }
+  .modal-field textarea{resize:vertical;min-height:64px;}
+  .modal-actions{display:flex;gap:10px;margin-top:16px;}
+  .modal-actions button{
+    flex:1;padding:11px;border-radius:9px;border:none;font-weight:700;font-size:13.5px;cursor:pointer;
+    font-family:var(--font-body);
+  }
+  .modal-cancel{background:var(--bg-alt);color:var(--ink-soft);}
+  .modal-submit{background:var(--accent);color:#fff;}
+  .modal-submit:disabled{opacity:.6;cursor:default;}
+  .modal-msg{font-size:12.5px;margin-top:10px;}
+  .modal-msg.ok{color:#1a7a4a;}
+  .modal-msg.err{color:var(--accent-2);}
+
+  /* ---------- AUTH MODAL ---------- */
+  .auth-tabs{display:flex;gap:6px;margin-bottom:16px;background:var(--bg-alt);padding:4px;border-radius:10px;}
+  .auth-tab{
+    flex:1;padding:8px;border-radius:7px;border:none;background:none;
+    font-weight:700;font-size:13px;color:var(--ink-faint);cursor:pointer;
+    font-family:var(--font-body);transition:background .15s,color .15s;
+  }
+  .auth-tab.active{background:var(--surface);color:var(--ink);box-shadow:0 2px 6px rgba(10,25,35,.08);}
+
+  footer{
+    border-top:1px solid var(--line);
+    padding:34px 0;
+    display:flex;align-items:center;justify-content:space-between;
+    font-size:13px;color:var(--ink-faint);
+    flex-wrap:wrap;gap:10px;
+  }
+  footer .f-brand{font-family:var(--font-display);font-weight:700;color:var(--ink);}
+  footer .f-admin{color:var(--ink-faint);text-decoration:none;font-size:12px;}
+  footer .f-admin:hover{color:var(--accent-2);}
+  .brand a{text-decoration:none;color:inherit;}
+  .nav-links a.is-current{color:var(--accent-2);}
+  .board{min-height:calc(100vh - 220px);}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="brand"><span class="dot"></span><a href="index.html">Shape of Shannon's</a></div>
+  <div class="nav-right">
+    <div class="nav-links">
+      <a href="index.html#carousel">Choose a Board</a>
+      <a href="index.html#story">Our Story</a>
+      <a href="index.html#lineup">Full Lineup</a>
+      <a href="board.html" class="is-current">Q&amp;A</a>
+    </div>
+    <div id="authArea"></div>
+  </div>
+</nav>
+
+<section class="board">
+  <div class="wrap">
+    <div class="board-head">
+      <h2>Q&amp;A</h2>
+      <p>Ask about a board, an order, or anything else &mdash; every question gets an answer.</p>
+    </div>
+
+    <form class="post-form" id="postForm" hidden>
+      <input type="text" id="postTitle" maxlength="120" placeholder="Title" required>
+      <textarea id="postBody" maxlength="4000" placeholder="What would you like to know?" required></textarea>
+      <div class="post-form-foot">
+        <span class="post-as" id="postAs"></span>
+        <button type="submit" id="postSubmitBtn">Post</button>
+      </div>
+      <div class="modal-msg" id="postMsg"></div>
+    </form>
+
+    <div class="post-locked" id="postLocked">
+      <p>Log in to post a question.</p>
+      <button type="button" class="auth-btn" id="lockedLoginBtn">Log In / Sign Up</button>
+    </div>
+
+    <div class="post-list" id="postList"></div>
+  </div>
+</section>
+
+<footer class="wrap">
+  <div class="f-brand">Shape of Shannon's</div>
+  <div>Hyeonbuk-myeon, Yangyang, Gangwon-do, South Korea &middot; hello@shapeofshannons.kr</div>
+  <div>&copy; 2026 Shape of Shannon's &middot; <a href="admin.html" class="f-admin">Admin</a></div>
+</footer>
+
+<div class="modal-overlay" id="authModal" hidden>
+  <div class="modal-box">
+    <div class="auth-tabs">
+      <button type="button" class="auth-tab active" id="authTabLogin" onclick="setAuthMode('login')">Log In</button>
+      <button type="button" class="auth-tab" id="authTabSignup" onclick="setAuthMode('signup')">Sign Up</button>
+    </div>
+    <form id="authForm">
+      <div class="modal-field">
+        <label for="authEmail">Email</label>
+        <input type="email" id="authEmail" required autocomplete="email">
+      </div>
+      <div class="modal-field">
+        <label for="authPw">Password</label>
+        <input type="password" id="authPw" required minlength="6" autocomplete="current-password">
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="modal-cancel" onclick="closeAuthModal()">Cancel</button>
+        <button type="submit" class="modal-submit" id="authSubmitBtn">Log In</button>
+      </div>
+      <div class="modal-msg" id="authMsg"></div>
+    </form>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+  var SUPABASE_URL = 'https://wzgzyycamyvkjhbpqdox.supabase.co';
+  var SUPABASE_ANON_KEY = 'sb_publishable_MiqutEwYnwRyPoNWFwqPPQ_xIriOigw';
+  var sb = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+  var authMode = 'login';
+  var currentUser = null;
+  var isAdmin = false;
+  var _posts = [], _replies = {};
+
+  function esc(s){
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+  function fmtPostDate(iso){
+    var d = new Date(iso);
+    if (isNaN(d)) return '';
+    var p = function(n){ return (n < 10 ? '0' : '') + n; };
+    return d.getFullYear() + '.' + p(d.getMonth() + 1) + '.' + p(d.getDate());
+  }
+
+  function setAuthMode(mode){
+    authMode = mode;
+    document.getElementById('authTabLogin').classList.toggle('active', mode === 'login');
+    document.getElementById('authTabSignup').classList.toggle('active', mode === 'signup');
+    document.getElementById('authSubmitBtn').textContent = mode === 'login' ? 'Log In' : 'Sign Up';
+    document.getElementById('authPw').autocomplete = mode === 'login' ? 'current-password' : 'new-password';
+    var msgEl = document.getElementById('authMsg');
+    msgEl.textContent = ''; msgEl.className = 'modal-msg';
+  }
+  function openAuthModal(mode){
+    setAuthMode(mode || 'login');
+    document.getElementById('authForm').reset();
+    document.getElementById('authModal').hidden = false;
+  }
+  function closeAuthModal(){ document.getElementById('authModal').hidden = true; }
+  window.setAuthMode = setAuthMode;
+  window.openAuthModal = openAuthModal;
+  window.closeAuthModal = closeAuthModal;
+
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape' && !document.getElementById('authModal').hidden) closeAuthModal();
+  });
+  document.getElementById('authModal').addEventListener('click', function(e){
+    if (e.target === this) closeAuthModal();
+  });
+
+  function renderBoard(){
+    var form = document.getElementById('postForm');
+    var locked = document.getElementById('postLocked');
+    if (form && locked) {
+      form.hidden = !currentUser;
+      locked.hidden = !!currentUser;
+      var as = document.getElementById('postAs');
+      if (as && currentUser) as.textContent = 'Posting as ' + currentUser.email;
+    }
+    loadPosts();
+  }
+
+  function loadPosts(){
+    var list = document.getElementById('postList');
+    if (!list) return;
+    if (!sb) { list.innerHTML = '<p class="post-empty">The board is unavailable right now.</p>'; return; }
+    sb.from('posts').select('id,title,body,author_label,created_at')
+      .order('created_at', { ascending: false }).limit(50)
+      .then(function(res){
+        if (res.error) { list.innerHTML = '<p class="post-empty">Could not load posts.</p>'; return; }
+        _posts = res.data || [];
+        if (!_posts.length) {
+          _replies = {};
+          list.innerHTML = '<p class="post-empty">No questions yet &mdash; be the first to ask.</p>';
+          return;
+        }
+        return sb.from('post_replies').select('id,post_id,body,created_at')
+          .order('created_at', { ascending: true })
+          .then(function(r2){
+            _replies = {};
+            (r2.data || []).forEach(function(r){
+              (_replies[r.post_id] = _replies[r.post_id] || []).push(r);
+            });
+            paintPosts();
+          });
+      });
+  }
+
+  function paintPosts(){
+    var list = document.getElementById('postList');
+    if (!list) return;
+    list.innerHTML = _posts.map(function(p){
+      var html = '<article class="post">' +
+        '<div class="post-head">' +
+          '<h3>' + esc(p.title) + '</h3>' +
+          '<span class="post-meta">' + esc(p.author_label) + ' · ' + fmtPostDate(p.created_at) + '</span>' +
+        '</div>' +
+        '<p class="post-body">' + esc(p.body) + '</p>';
+      (_replies[p.id] || []).forEach(function(r){
+        html += '<div class="post-reply">' +
+                  '<span class="reply-badge">Shaper</span>' +
+                  '<p>' + esc(r.body) + '</p>' +
+                  '<span class="post-meta">' + fmtPostDate(r.created_at) + '</span>' +
+                '</div>';
+      });
+      if (isAdmin) {
+        html += '<form class="reply-form" data-post="' + esc(p.id) + '">' +
+                  '<textarea placeholder="Write a reply" maxlength="4000" required></textarea>' +
+                  '<button type="submit">Reply</button>' +
+                '</form>';
+      }
+      return html + '</article>';
+    }).join('');
+
+    if (!isAdmin) return;
+    Array.prototype.forEach.call(list.querySelectorAll('.reply-form'), function(f){
+      f.addEventListener('submit', function(e){
+        e.preventDefault();
+        var ta = f.querySelector('textarea'), btn = f.querySelector('button');
+        var body = ta.value.trim();
+        if (!body) return;
+        btn.disabled = true; btn.textContent = 'Posting...';
+        sb.from('post_replies').insert({ post_id: f.dataset.post, body: body }).then(function(res){
+          btn.disabled = false; btn.textContent = 'Reply';
+          if (res.error) { alert('Reply failed: ' + res.error.message); return; }
+          ta.value = '';
+          loadPosts();
+        });
+      });
+    });
+  }
+
+  document.getElementById('postForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    var msgEl = document.getElementById('postMsg');
+    var btn = document.getElementById('postSubmitBtn');
+    var title = document.getElementById('postTitle').value.trim();
+    var body = document.getElementById('postBody').value.trim();
+    msgEl.textContent = ''; msgEl.className = 'modal-msg';
+    if (!title || !body) return;
+    if (!sb) { msgEl.className = 'modal-msg err'; msgEl.textContent = 'The board is unavailable right now.'; return; }
+    btn.disabled = true; btn.textContent = 'Posting...';
+    sb.from('posts').insert({ title: title, body: body }).then(function(res){
+      btn.disabled = false; btn.textContent = 'Post';
+      if (res.error) {
+        msgEl.className = 'modal-msg err';
+        msgEl.textContent = 'Could not post: ' + res.error.message;
+        return;
+      }
+      document.getElementById('postForm').reset();
+      msgEl.className = 'modal-msg ok';
+      msgEl.textContent = 'Posted.';
+      loadPosts();
+    });
+  });
+
+  function renderAuthArea(){
+    var area = document.getElementById('authArea');
+    if (currentUser) {
+      area.innerHTML = '<div class="auth-user"><span class="who">' + esc(currentUser.email) + '</span><a href="admin.html" id="adminLink" class="admin-link" hidden>Admin</a><button type="button" id="logoutBtn">Log Out</button></div>';
+      document.getElementById('logoutBtn').addEventListener('click', function(){ sb.auth.signOut(); });
+      sb.from('admins').select('user_id').maybeSingle().then(function(res){
+        isAdmin = !!res.data;
+        if (isAdmin) {
+          var link = document.getElementById('adminLink');
+          if (link) link.hidden = false;
+          if (_posts.length) paintPosts();
+        }
+      });
+    } else {
+      isAdmin = false;
+      area.innerHTML = '<button type="button" class="auth-btn" id="navLoginBtn">Log In / Sign Up</button>';
+      document.getElementById('navLoginBtn').addEventListener('click', function(){ openAuthModal('login'); });
+    }
+    renderBoard();
+  }
+
+  document.getElementById('lockedLoginBtn').addEventListener('click', function(){ openAuthModal('login'); });
+
+  if (sb) {
+    document.getElementById('authForm').addEventListener('submit', function(e){
+      e.preventDefault();
+      var msgEl = document.getElementById('authMsg');
+      var btn = document.getElementById('authSubmitBtn');
+      var email = document.getElementById('authEmail').value.trim();
+      var pw = document.getElementById('authPw').value;
+      btn.disabled = true;
+      if (authMode === 'signup') {
+        sb.auth.signUp({ email: email, password: pw }).then(function(res){
+          btn.disabled = false;
+          if (res.error) { msgEl.textContent = 'Sign-up failed: ' + res.error.message; msgEl.className = 'modal-msg err'; return; }
+          if (res.data.session) {
+            msgEl.textContent = "You're signed up! You're now logged in.";
+            msgEl.className = 'modal-msg ok';
+            setTimeout(closeAuthModal, 1200);
+          } else {
+            msgEl.textContent = "We've sent a confirmation email. Please check your inbox.";
+            msgEl.className = 'modal-msg ok';
+          }
+        });
+      } else {
+        sb.auth.signInWithPassword({ email: email, password: pw }).then(function(res){
+          btn.disabled = false;
+          if (res.error) { msgEl.textContent = 'Log-in failed: ' + res.error.message; msgEl.className = 'modal-msg err'; return; }
+          msgEl.textContent = 'Logged in!';
+          msgEl.className = 'modal-msg ok';
+          setTimeout(closeAuthModal, 800);
+        });
+      }
+    });
+
+    sb.auth.onAuthStateChange(function(event, session){
+      currentUser = session ? session.user : null;
+      renderAuthArea();
+    });
+    sb.auth.getSession().then(function(res){
+      currentUser = res.data.session ? res.data.session.user : null;
+      renderAuthArea();
+    });
+  } else {
+    renderAuthArea();
+  }
+</script>
+</body>
+</html>
